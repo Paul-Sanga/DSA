@@ -66,6 +66,56 @@ impl List{
         }
     }
 
+    pub fn remove_first(&mut self){
+        if self.size == 1{
+            self.head = None;
+            self.tail = None;
+            self.size -= 1;
+        }else {
+            if let Some(current_head) = self.head.take(){
+                if let Some(new_head) = &current_head.borrow().next{
+                    new_head.borrow_mut().prev = None;
+                    self.size -= 1;
+                    self.head = Some(Rc::clone(new_head));
+                    
+                }else {
+                    println!("Empty new head");
+                }
+            }else {
+                println!("Current head is empty");
+            }
+        }
+    }
+
+    pub fn remove_last(&mut self){
+        if self.size == 1{
+            self.head = None;
+            self.tail = None;
+            self.size -= 1;
+        }else {
+            if let Some(current_tail) = self.tail.take(){
+                if let Some(tail) = current_tail.upgrade(){
+                    if let Some(new_tail) = &tail.borrow().prev{
+                        if let Some(new_tail) = new_tail.upgrade(){
+                            new_tail.borrow_mut().next = None;
+                            self.tail = Some(Rc::downgrade(&new_tail));
+                            self.size -= 1;
+                        }else{
+                            println!("Empty new tail");
+                        }
+                    }else {
+                        println!("Empty new tail")
+                    }
+                    
+                }else {
+                    println!("Tail has no value");
+                }
+            }else {
+                println!("Empty tail");
+            }
+        }
+    }
+
     pub fn head(&self)->Option<u32>{
         if let Some(node) = &self.head{
             return Some(node.borrow().get_value());
